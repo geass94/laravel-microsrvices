@@ -1,0 +1,71 @@
+version: '3'
+services:
+  app:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    working_dir: /var/www/api-gateway
+    volumes:
+      - ./api-gateway:/var/www/api-gateway
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=root
+      - DB_PASSWORD=secret
+    depends_on:
+      - mysql
+      - nginx_app1
+
+  app2:
+    build:
+      context: ./logistics
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    working_dir: /var/www/logistics
+    volumes:
+      - ./logistics:/var/www/logistics
+    depends_on:
+      - mysql
+      - nginx_app2
+
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=laravel
+      - MYSQL_USER=laravel
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_CHARSET=utf8mb4
+      - MYSQL_COLLATION=utf8mb4_general_ci
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+  nginx_app1:
+    image: nginx:1.19.8-alpine
+    restart: unless-stopped
+    tty: true
+    ports:
+      - 8080:80
+    volumes:
+      - ./api-gateway:/var/www/api-gateway
+      - ./.docker/nginx/conf:/etc/nginx/conf.d
+
+  nginx_app2:
+    image: nginx:1.19.8-alpine
+    restart: unless-stopped
+    tty: true
+    ports:
+      - 8081:81
+    volumes:
+      - ./logistics:/var/www/logistics
+      - ./.docker/nginx/conf:/etc/nginx/conf.d
+
+
+volumes:
+  db_data:
