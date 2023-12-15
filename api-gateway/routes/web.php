@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $logistics = (\Illuminate\Support\Facades\Http::get('http://nginx_app2:81/')->body());
+    $logistics = (\Illuminate\Support\Facades\Http::get('http://nginx:81/')->body());
     return $logistics;
+    return view('welcome');
 });

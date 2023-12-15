@@ -16,7 +16,7 @@ services:
       - DB_PASSWORD=secret
     depends_on:
       - mysql
-      - nginx_app1
+      - nginx
 
   app2:
     build:
@@ -28,7 +28,7 @@ services:
       - ./logistics:/var/www/logistics
     depends_on:
       - mysql
-      - nginx_app2
+      - nginx
 
 
   mysql:
@@ -46,7 +46,7 @@ services:
     ports:
       - 3306:3306
 
-  nginx_app1:
+  nginx:
     image: nginx:1.19.8-alpine
     restart: unless-stopped
     tty: true
@@ -54,15 +54,6 @@ services:
       - 8080:80
     volumes:
       - ./api-gateway:/var/www/api-gateway
-      - ./.docker/nginx/conf:/etc/nginx/conf.d
-
-  nginx_app2:
-    image: nginx:1.19.8-alpine
-    restart: unless-stopped
-    tty: true
-    ports:
-      - 8081:81
-    volumes:
       - ./logistics:/var/www/logistics
       - ./.docker/nginx/conf:/etc/nginx/conf.d
 
